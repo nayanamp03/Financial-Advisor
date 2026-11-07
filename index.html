@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ledgerlight – Personal Financial Advisor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#f2f5f5;--card:#fff;--ink:#14232b;--mut:#5b6b72;--line:#d7e0e2;--teal:#0f6b6e;--teal2:#dff0f0;--amber:#a86f00;--amb2:#fbefd2;--red:#b3402f;--red2:#f9e1dc;--grn:#2c7a3f;--grn2:#dff1e2;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1f;--card:#17262d;--ink:#e6eef0;--mut:#9db0b6;--line:#2a3d45;--teal:#4cc3c6;--teal2:#16393c;--amber:#e8b44a;--amb2:#3a2f14;--red:#f08a78;--red2:#41201b;--grn:#7fd091;--grn2:#17341e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a1f;--card:#17262d;--ink:#e6eef0;--mut:#9db0b6;--line:#2a3d45;--teal:#4cc3c6;--teal2:#16393c;--amber:#e8b44a;--amb2:#3a2f14;--red:#f08a78;--red2:#41201b;--grn:#7fd091;--grn2:#17341e;color-scheme:dark}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3{margin:0;line-height:1.15}
+h1{font-size:2rem;font-weight:700}h2{font-size:1.35rem;margin-bottom:12px}h3{font-size:1.05rem;margin-bottom:6px}
+p{margin:0 0 10px}.mut{color:var(--mut)}.small{font-size:.88rem}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;color:var(--mut);font:inherit;font-weight:500;padding:10px 14px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--teal);border-color:var(--teal)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+label{display:block;font-size:.85rem;color:var(--mut);margin-bottom:3px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 10px}
+.btn{font:inherit;font-weight:500;background:var(--teal);color:var(--bg);border:0;border-radius:6px;padding:10px 16px;cursor:pointer}
+.btn.alt{background:none;color:var(--teal);border:1px solid var(--teal)}
+.btn.sm{padding:5px 10px;font-size:.85rem}
+.sum{display:flex;gap:24px;flex-wrap:wrap;padding:14px 18px;background:var(--teal2);border-radius:10px;margin-top:4px}
+.sum b{display:block;font-size:1.45rem}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.row:last-child{border:0}
+.tag{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:99px;background:var(--teal2);color:var(--teal);margin-right:4px}
+.tag.r{background:var(--red2);color:var(--red)}.tag.a{background:var(--amb2);color:var(--amber)}.tag.g{background:var(--grn2);color:var(--grn)}
+.hero{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.score{width:128px;height:128px;border-radius:50%;display:grid;place-items:center;text-align:center;flex:none;border:10px solid var(--c)}
+.score b{font-size:2rem;display:block;line-height:1}
+.bar{height:9px;background:var(--line);border-radius:9px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--teal)}
+.issue{border-left:4px solid var(--c);padding:8px 12px;margin-bottom:10px;background:var(--bg);border-radius:0 6px 6px 0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:.92rem}
+.hide{display:none}
+#auth{max-width:420px;margin:8vh auto}
+.err{color:var(--red);min-height:1.4em}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .4s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div id="auth" class="card">
+  <h1>Ledgerlight</h1>
+  <p class="mut">A personal financial advisor for loans, savings and goals. Your data stays in this browser.</p>
+  <label for="an">Your name</label><input id="an" autocomplete="username">
+  <div style="height:10px"></div>
+  <label for="ap">PIN (4 or more digits)</label><input id="ap" type="password" inputmode="numeric" autocomplete="current-password">
+  <p class="err" id="aerr"></p>
+  <button class="btn" id="signin">Sign in</button> <button class="btn alt" id="signup">Create account</button>
+  <p class="small mut" style="margin-top:14px">Accounts are saved on this device only. Clearing browser data removes them.</p>
+</div>
+
+<div id="app" class="hide">
+  <div class="top">
+    <div><h1>Ledgerlight</h1><div class="mut small" id="hello"></div></div>
+    <div><button class="btn alt sm" id="demo">Load example</button> <button class="btn alt sm" id="out">Sign out</button></div>
+  </div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <section id="t-profile">
+    <div class="card"><h2>About you</h2>
+      <div class="grid">
+        <div><label for="p-age">Age</label><input id="p-age" type="number" data-s="profile.age"></div>
+        <div><label for="p-occ">Occupation</label><select id="p-occ" data-s="profile.occ"><option>Student</option><option>Salaried employee</option><option>Self-employed</option><option>Freelancer</option><option>Business owner</option><option>Other</option></select></div>
+        <div><label for="p-inc">Monthly income (₹)</label><input id="p-inc" type="number" min="0" data-s="profile.income"></div>
+        <div><label for="p-oth">Other monthly income (₹)</label><input id="p-oth" type="number" min="0" data-s="profile.other"></div>
+        <div><label for="p-sav">Savings and emergency fund (₹)</label><input id="p-sav" type="number" min="0" data-s="profile.savings"></div>
+      </div>
+    </div>
+    <div class="card"><h2>Monthly expenses</h2>
+      <p class="small mut">Enter living costs only. Add loan EMIs under Debts so they aren’t counted twice.</p>
+      <div class="grid" id="expgrid"></div>
+      <div class="sum" id="profsum"></div>
+    </div>
+  </section>
+
+  <section id="t-debts" class="hide">
+    <div class="card"><h2>Add a loan or debt</h2>
+      <div class="grid" id="dform"></div>
+      <div style="margin-top:12px"><button class="btn" id="dadd">Add debt</button> <span class="err" id="derr"></span></div>
+    </div>
+    <div class="card"><h2>Your debts</h2><div id="dlist"></div></div>
+  </section>
+
+  <section id="t-goals" class="hide">
+    <div class="card"><h2>Add a goal</h2>
+      <div class="grid" id="gform"></div>
+      <div style="margin-top:12px"><button class="btn" id="gadd">Add goal</button> <span class="err" id="gerr"></span></div>
+    </div>
+    <div class="card"><h2>Your goals</h2><div id="glist"></div></div>
+  </section>
+
+  <section id="t-advisor" class="hide"></section>
+</div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const inr=n=>(n<0?'−':'')+'₹'+Math.round(Math.abs(n)).toLocaleString('en-IN');
+const num=v=>Math.max(0,parseFloat(v)||0);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mem={};
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]??null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}}};
+const EXP=[['rent','Rent'],['food','Food'],['transport','Transportation'],['utilities','Electricity and utilities'],['education','Education'],['medical','Medical'],['family','Family'],['subs','Subscriptions'],['otherx','Other']];
+const LT=['Education Loan','Gold Loan','Personal Loan','Home Loan','Vehicle Loan','Credit Card','Other'];
+const GT=['Repay education loan','Repay gold loan','Become debt-free','Build emergency fund','Save for higher education','Buy a vehicle','Buy a house','Start a business','Save for marriage','Save for travel','Build retirement savings','Invest regularly','Custom goal'];
+const PR=['High','Medium','Low'];
+let user=null,S=null,tab='profile';
+const blank=()=>({profile:{age:'',occ:'Salaried employee',income:'',other:'',savings:''},exp:{},debts:[],goals:[]});
+
+async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ll:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa(s)}}
+const accts=()=>{try{return JSON.parse(ls.get('ll:accts')||'{}')}catch(e){return{}}};
+async function auth(create){
+  const n=$('#an').value.trim(),p=$('#ap').value,A=accts(),k=n.toLowerCase(),e=$('#aerr');
+  if(!n){e.textContent='Enter your name.';return}
+  if(!/^\d{4,}$/.test(p)){e.textContent='Use a PIN of at least 4 digits.';return}
+  const h=await hash(p);
+  if(create){if(A[k]){e.textContent='That name already has an account. Sign in instead.';return}A[k]=h;ls.set('ll:accts',JSON.stringify(A));ls.set('ll:d:'+k,JSON.stringify({...blank(),name:n}))}
+  else if(A[k]!==h){e.textContent='Name or PIN is incorrect.';return}
+  user=k;try{S=JSON.parse(ls.get('ll:d:'+k))}catch(x){S=null}
+  if(!S)S={...blank(),name:n};
+  start();
+}
+const save=()=>{if(user)ls.set('ll:d:'+user,JSON.stringify(S))};
+$('#signin').onclick=()=>auth(false);$('#signup').onclick=()=>auth(true);
+$('#out').onclick=()=>{user=null;S=null;$('#app').classList.add('hide');$('#auth').classList.remove('hide');$('#ap').value=''};
+
+function start(){
+  $('#auth').classList.add('hide');$('#app').classList.remove('hide');
+  $('#hello').textContent='Signed in as '+S.name;
+  fillProfile();renderAll();show(tab);
+}
+const TABS=[['profile','Profile'],['debts','Debts'],['goals','Goals'],['advisor','Advisor']];
+$('#tabs').innerHTML=TABS.map(([k,l])=>`<button role="tab" data-t="${k}">${l}</button>`).join('');
+$('#tabs').onclick=e=>{const t=e.target.dataset.t;if(t)show(t)};
+function show(t){tab=t;TABS.forEach(([k])=>{$('#t-'+k).classList.toggle('hide',k!==t)});
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
+  if(t==='advisor')renderAdvisor();window.scrollTo(0,0)}
+
+/* profile + expenses */
+$('#expgrid').innerHTML=EXP.map(([k,l])=>`<div><label for="x-${k}">${l} (₹)</label><input id="x-${k}" type="number" min="0" data-s="exp.${k}"></div>`).join('');
+function fillProfile(){document.querySelectorAll('[data-s]').forEach(el=>{const[a,b]=el.dataset.s.split('.');el.value=S[a][b]??''});sumProfile()}
+document.addEventListener('input',e=>{const s=e.target.dataset&&e.target.dataset.s;if(!s||!S)return;const[a,b]=s.split('.');S[a][b]=e.target.value;save();sumProfile()});
+const calc=()=>{const inc=num(S.profile.income)+num(S.profile.other),ex=EXP.reduce((t,[k])=>t+num(S.exp[k]),0),emi=S.debts.reduce((t,d)=>t+d.emi,0);return{inc,ex,emi,disp:inc-ex,free:inc-ex-emi}};
+function sumProfile(){const c=calc();$('#profsum').innerHTML=`<div><span class="small mut">Total income</span><b>${inr(c.inc)}</b></div><div><span class="small mut">Total monthly expenses</span><b>${inr(c.ex)}</b></div><div><span class="small mut">Monthly disposable income</span><b>${inr(c.disp)}</b></div>`}
+
+/* debts */
+const F=(id,l,inner)=>`<div><label for="${id}">${l}</label>${inner}</div>`;
+const I=(id,t='number',x='')=>`<input id="${id}" type="${t}" ${t==='number'?'min="0" step="any"':''} ${x}>`;
+const SEL=(id,o)=>`<select id="${id}">${o.map(v=>`<option>${v}</option>`).join('')}</select>`;
+$('#dform').innerHTML=[F('d-type','Loan type',SEL('d-type',LT)),F('d-orig','Original amount (₹)',I('d-orig')),F('d-out','Current outstanding (₹)',I('d-out')),F('d-rate','Interest rate (% per year)',I('d-rate')),F('d-emi','EMI or minimum due (₹)',I('d-emi')),F('d-ten','Remaining tenure (months)',I('d-ten')),F('d-due','Due date (day of month)',I('d-due','number','max="31"')),F('d-pay','Remaining payments',I('d-pay')),F('d-fc','Prepayment charge (%)',I('d-fc')),F('d-pri','Priority',SEL('d-pri',PR)),F('d-sec','Secured?',SEL('d-sec',['Secured','Unsecured']))].join('');
+$('#dadd').onclick=()=>{const g=i=>$('#d-'+i).value,o=num(g('out')),r=num(g('rate')),e=num(g('emi'));
+  if(!o||!e){$('#derr').textContent='Enter the outstanding amount and the EMI.';return}
+  S.debts.push({type:g('type'),orig:num(g('orig')),out:o,rate:r,emi:e,ten:num(g('ten')),due:num(g('due')),pay:num(g('pay')),fc:num(g('fc')),pri:g('pri'),sec:g('sec')});
+  $('#derr').textContent='';['orig','out','rate','emi','ten','due','pay','fc'].forEach(i=>$('#d-'+i).value='');save();renderAll()};
+function renderDebts(){const L=S.debts;$('#dlist').innerHTML=L.length?L.map((d,i)=>`<div class="row"><div><b>${esc(d.type)}</b> <span class="tag ${d.rate>=15?'r':d.rate>=10?'a':'g'}">${d.rate}% interest</span><span class="tag">${d.sec}</span><span class="tag">${d.pri} priority</span><div class="small mut">${inr(d.out)} outstanding${d.orig?' of '+inr(d.orig):''} · EMI ${inr(d.emi)}${d.ten?' · '+d.ten+' months left':''}${d.due?' · due on day '+d.due:''}${d.fc?' · '+d.fc+'% prepayment charge':''}</div></div><button class="btn alt sm" data-rm="${i}">Remove</button></div>`).join(''):'<p class="mut">No debts yet. Add each loan or credit card above, or skip this if you have none.</p>'}
+$('#dlist').onclick=e=>{const i=e.target.dataset.rm;if(i!==undefined){S.debts.splice(+i,1);save();renderAll()}};
+
+/* goals */
+$('#gform').innerHTML=[F('g-type','Goal',SEL('g-type',GT)),F('g-name','Goal name',I('g-name','text','placeholder="e.g. Master’s in Chennai"')),F('g-tar','Target amount (₹)',I('g-tar')),F('g-cur','Saved so far (₹)',I('g-cur')),F('g-date','Target date',I('g-date','date')),F('g-pri','Priority',SEL('g-pri',PR))].join('');
+$('#gadd').onclick=()=>{const t=num($('#g-tar').value),dt=$('#g-date').value;
+  if(!t||!dt){$('#gerr').textContent='Enter a target amount and date.';return}
+  S.goals.push({type:$('#g-type').value,name:$('#g-name').value.trim()||$('#g-type').value,tar:t,cur:num($('#g-cur').value),date:dt,pri:$('#g-pri').value});
+  $('#gerr').textContent='';['name','tar','cur','date'].forEach(i=>$('#g-'+i).value='');save();renderAll()};
+const monthsTo=d=>{const n=new Date(),t=new Date(d);return (t.getFullYear()-n.getFullYear())*12+t.getMonth()-n.getMonth()+(t.getDate()>=n.getDate()?0:-1)};
+const need=g=>{const m=monthsTo(g.date),left=Math.max(0,g.tar-g.cur);return{m,left,pm:left===0?0:m>0?left/m:Infinity}};
+function renderGoals(){$('#glist').innerHTML=S.goals.length?S.goals.map((g,i)=>{const n=need(g),p=Math.min(100,g.cur/g.tar*100);
+  return `<div class="row"><div style="flex:1;min-width:220px"><b>${esc(g.name)}</b> <span class="tag">${g.pri} priority</span><div class="small mut">${inr(g.cur)} of ${inr(g.tar)} by ${g.date}</div><div class="bar"><i style="width:${p}%"></i></div><div class="small">${n.left===0?'Goal reached.':n.m<=0?'Target date has passed. Set a new date.':'Save <b>'+inr(n.pm)+'</b> per month for '+n.m+' months.'}</div></div><button class="btn alt sm" data-rg="${i}">Remove</button></div>`}).join(''):'<p class="mut">No goals yet. Add one above to see how much to save each month.</p>'}
+$('#glist').onclick=e=>{const i=e.target.dataset.rg;if(i!==undefined){S.goals.splice(+i,1);save();renderAll()}};
+function renderAll(){renderDebts();renderGoals();sumProfile();if(tab==='advisor')renderAdvisor()}
+
+/* analysis engine */
+function sim(debts,extra,mode){const d=debts.map(x=>({b:x.out,r:x.rate/1200,e:x.emi,rt:x.rate}));let m=0,int=0;
+  while(d.some(x=>x.b>0.5)&&m<600){m++;let pool=extra;
+    for(const x of d){if(x.b<=0.5){pool+=x.e;continue}const i=x.b*x.r;int+=i;x.b+=i;const p=Math.min(x.e,x.b);x.b-=p;pool+=x.e-p}
+    const tg=d.filter(x=>x.b>0.5).sort(mode==='snow'?(a,b)=>a.b-b.b:(a,b)=>b.rt-a.rt);
+    for(const x of tg){if(pool<=0)break;const p=Math.min(pool,x.b);x.b-=p;pool-=p}}
+  return{m,int,done:!d.some(x=>x.b>0.5)}}
+const dur=m=>m>=600?'more than 50 years':(m>=12?Math.floor(m/12)+' yr ':'')+(m%12?m%12+' mo':m>=12?'':'0 mo');
+let extraOverride=null;
+function analyse(){
+  const c=calc(),p=S.profile,sav=num(p.savings),D=S.debts,debt=D.reduce((t,d)=>t+d.out,0);
+  const dti=c.inc?c.emi/c.inc:0,outflow=c.ex+c.emi,efm=outflow?sav/outflow:0;
+  const tm={Student:3,'Salaried employee':6}[p.occ]||9,efT=outflow*tm;
+  const hi=D.filter(d=>d.rate>=15),unsec=D.filter(d=>d.sec==='Unsecured');
+  let score=100;const probs=[],wins=[];
+  const add=(lvl,t,x)=>probs.push({lvl,t,x});
+  if(!c.inc)add('r','No income entered','Add your monthly income on the Profile tab so the analysis is meaningful.');
+  if(c.free<0){score-=30;add('r','Negative monthly cash flow','You spend '+inr(-c.free)+' more than you earn each month, which means savings shrink or debt grows. Cutting expenses or raising income comes before any other goal.')}
+  else if(c.inc&&c.free<c.inc*.1){score-=10;add('a','Thin monthly surplus','Only '+inr(c.free)+' is left after expenses and EMIs ('+Math.round(c.free/c.inc*100)+'% of income). One unexpected bill could push you into new debt.')}
+  else if(c.inc)wins.push('Your surplus of '+inr(c.free)+' per month gives you room to act.');
+  if(dti>.5){score-=35;add('r','Very high EMI burden','EMIs take '+Math.round(dti*100)+'% of your income. Lenders treat above 40–50% as stressed.')}
+  else if(dti>.36){score-=22;add('a','High EMI burden','EMIs take '+Math.round(dti*100)+'% of your income, above the comfortable 35% mark.')}
+  else if(dti>.2){score-=8;add('a','Moderate EMI load','EMIs take '+Math.round(dti*100)+'% of your income. Manageable, but avoid new loans for now.')}
+  else if(D.length)wins.push('Your EMIs are only '+Math.round(dti*100)+'% of income, which is healthy.');
+  if(hi.length){score-=12;add('r','High-interest debt','You pay 15% or more on '+hi.map(d=>d.type+' ('+d.rate+'%)').join(', ')+'. This costs more than most savings or investments will earn.')}
+  if(efm<1&&outflow){score-=25;add('r','Almost no emergency fund','Your savings cover '+efm.toFixed(1)+' months of outflow. Aim for '+tm+' months ('+inr(efT)+') given you are a '+p.occ.toLowerCase()+'.')}
+  else if(efm<tm&&outflow){score-=(efm<3?15:6);add(efm<3?'r':'a','Emergency fund below target','You hold '+efm.toFixed(1)+' months of cover. A '+tm+'-month target ('+inr(efT)+') is safer'+(tm===9?', because your income is likely to vary.':'.'))}
+  else if(outflow)wins.push('Your emergency fund covers '+efm.toFixed(1)+' months, which meets the '+tm+'-month target.');
+  if(unsec.length>=3){score-=5;add('a','Many unsecured loans','You hold '+unsec.length+' unsecured debts. Consider consolidating them when it lowers the rate.')}
+  const gneed=S.goals.map(g=>({g,...need(g)})),gsum=gneed.reduce((t,x)=>t+(isFinite(x.pm)?x.pm:0),0);
+  score=Math.max(5,Math.min(100,Math.round(score)));
+  const lab=score>=75?['Strong','var(--grn)']:score>=50?['Moderate','var(--amber)']:['Needs attention','var(--red)'];
+  /* split of free cash */
+  const fc=Math.max(0,c.free);let sd=0,se=0,sg=0;
+  if(D.length){if(efm<3){se=.3;sd=.5;sg=.2}else{sd=.55;sg=.45}}else{se=efm<tm?.5:0;sg=1-se}
+  const ex=extraOverride===null?Math.round(fc*sd/100)*100:extraOverride;
+  return{c,p,sav,D,debt,dti,efm,tm,efT,hi,probs,wins,gneed,gsum,score,lab,fc,sd,se,sg,ex,outflow};
+}
+function renderAdvisor(){
+  const A=analyse(),{c,D}=A,el=$('#t-advisor');
+  if(!c.inc&&!D.length){el.innerHTML='<div class="card"><h2>Nothing to analyse yet</h2><p class="mut">Enter your income and expenses on the Profile tab, then add any loans. Use “Load example” at the top to see a sample.</p></div>';return}
+  const ranked=[...D].map(d=>({...d,cost:d.rate})).sort((a,b)=>b.rate-a.rate||(a.sec==='Unsecured'?-1:1));
+  const base=D.length?sim(D,0,'av'):null,av=D.length?sim(D,A.ex,'av'):null,sn=D.length?sim(D,A.ex,'snow'):null;
+  let h=`<div class="card"><div class="hero"><div class="score" style="--c:${A.lab[1]}"><div><b>${A.score}</b><span class="small mut">of 100</span></div></div><div style="flex:1;min-width:240px"><h2 style="margin-bottom:6px">Financial health: ${A.lab[0]}</h2>
+  <p>Your monthly income is <b>${inr(c.inc)}</b> and your living expenses are <b>${inr(c.ex)}</b>, leaving <b>${inr(c.disp)}</b> disposable. Your EMIs total <b>${inr(c.emi)}</b>, so ${c.free>=0?'you have about <b>'+inr(c.free)+'</b> of monthly surplus.':'you fall short by <b>'+inr(-c.free)+'</b> every month.'}</p>
+  <p class="small mut">Debt-to-income ratio ${Math.round(A.dti*100)}% · Total debt ${inr(A.debt)} · Emergency cover ${A.efm.toFixed(1)} months</p></div></div></div>`;
+  h+=`<div class="card"><h2>Financial problems found</h2>${A.probs.length?A.probs.map(x=>`<div class="issue" style="--c:var(--${x.lvl==='r'?'red':'amber'})"><b>${x.t}</b><div class="small">${x.x}</div></div>`).join(''):'<p class="mut">No major problems found with the numbers you entered.</p>'}${A.wins.length?'<h3 style="margin-top:14px">What is working</h3>'+A.wins.map(w=>`<p class="small">✓ ${w}</p>`).join(''):''}</div>`;
+  if(D.length){
+    h+=`<div class="card"><h2>Which debt to pay first</h2><p class="small mut">Paying extra on the highest interest rate saves the most money. Charges are checked against the interest you would save.</p>
+    <div class="scroll"><table><thead><tr><th>Order</th><th>Debt</th><th>Rate</th><th>Outstanding</th><th>Note</th></tr></thead><tbody>${ranked.map((d,i)=>{const sv=d.out*d.rate/100*(Math.min(d.ten||12,12)/12),ch=d.out*d.fc/100;
+      const note=d.fc&&ch>sv?'Prepayment charge of '+inr(ch)+' is more than a year of interest saved. Prepay only if the rate is high.':d.rate>=15?'Highest cost. Prepay first.':d.sec==='Secured'&&d.type==='Gold Loan'?'Your gold is held as security. Clearing it releases the asset.':d.rate<9?'Low rate. Pay the EMI and focus elsewhere.':'Pay the EMI. Prepay when higher-rate debt is cleared.';
+      return `<tr><td>${i+1}</td><td>${esc(d.type)}</td><td>${d.rate}%</td><td>${inr(d.out)}</td><td class="small">${note}</td></tr>`}).join('')}</tbody></table></div></div>`;
+    h+=`<div class="card"><h2>Repayment plan</h2><label for="ex">Extra paid toward debt each month: <b id="exv">${inr(A.ex)}</b></label><input id="ex" type="range" min="0" max="${Math.max(0,Math.round(A.fc))}" step="100" value="${Math.min(A.ex,Math.round(A.fc))}">
+    <div class="grid" style="margin-top:14px">
+     <div class="sum" style="margin:0;display:block"><span class="small mut">Paying EMIs only</span><b>${dur(base.m)}</b><span class="small">Interest ${inr(base.int)}</span></div>
+     <div class="sum" style="margin:0;display:block"><span class="small mut">Highest rate first (avalanche)</span><b>${dur(av.m)}</b><span class="small">Interest ${inr(av.int)}</span></div>
+     <div class="sum" style="margin:0;display:block"><span class="small mut">Smallest balance first (snowball)</span><b>${dur(sn.m)}</b><span class="small">Interest ${inr(sn.int)}</span></div></div>
+    <p style="margin-top:12px">${A.ex>0?'Adding '+inr(A.ex)+' a month with the avalanche method makes you debt-free <b>'+dur(Math.max(0,base.m-av.m))+' sooner</b> and saves about <b>'+inr(base.int-av.int)+'</b> in interest.':'Increase the extra payment to see how much time and interest you could save.'}${!base.done?' <span class="tag r">At current EMIs some debt is not cleared within 50 years. Raise the EMI.</span>':''}</p></div>`;
+  }
+  h+=`<div class="card"><h2>Where to put your monthly surplus</h2>`;
+  if(A.fc<=0)h+='<p>There is no surplus to allocate. Start by trimming expenses, then revisit this plan.</p>';
+  else h+=`<p>Of your ${inr(A.fc)} surplus, a sensible split is:</p><p>${A.sd?`<span class="tag">Debt ${inr(A.fc*A.sd)}</span>`:''}${A.se?`<span class="tag a">Emergency fund ${inr(A.fc*A.se)}</span>`:''}${A.sg?`<span class="tag g">Goals and investing ${inr(A.fc*A.sg)}</span>`:''}</p><p class="small mut">${A.se?'The emergency fund comes first because it stops a surprise bill from becoming a new loan.':'Your emergency fund is in good shape, so most of the surplus can go to debt and goals.'}</p>`;
+  h+='</div>';
+  if(A.gneed.length){const sorted=[...A.gneed].sort((a,b)=>PR.indexOf(a.g.pri)-PR.indexOf(b.g.pri)),gb=A.fc*A.sg+0;
+    h+=`<div class="card"><h2>Goal check</h2><p>Your goals need <b>${inr(A.gsum)}</b> per month in total. ${A.gsum>A.fc?'That is more than your surplus of '+inr(A.fc)+'. Fund high-priority goals first or move target dates later.':'That fits within your surplus.'}</p>${sorted.map(x=>`<div class="row"><div><b>${esc(x.g.name)}</b> <span class="tag">${x.g.pri}</span><div class="small mut">${x.left===0?'Reached':x.m<=0?'Date passed':inr(x.pm)+' per month for '+x.m+' months'}</div></div></div>`).join('')}</div>`}
+  h+=`<div class="card"><h2>Your action list</h2><div id="acts"></div><p class="small mut" style="margin-top:12px">These suggestions come from the numbers you entered and general rules of thumb. They are not regulated financial advice. Check loan terms with your lender before prepaying.</p></div>`;
+  el.innerHTML=h;
+  const acts=[];
+  if(c.free<0)acts.push('Cut at least '+inr(-c.free)+' from monthly spending or raise income so cash flow turns positive.');
+  if(A.efm<3&&A.outflow)acts.push('Build a starter emergency fund of '+inr(A.outflow*3)+' before making large extra loan payments.');
+  if(D.length&&ranked[0])acts.push('Direct all extra money to the '+ranked[0].type+' ('+ranked[0].rate+'%) while paying minimum EMIs on the rest.');
+  if(A.hi.length)acts.push('Ask your lender about moving the high-rate balance to a lower-rate personal loan or a gold loan, if the total cost falls.');
+  if(A.dti>.36)acts.push('Avoid new loans until EMIs fall below 35% of income.');
+  if(D.length)acts.push('Set auto-debit for every EMI so no due date is missed. Late fees and credit score damage cost more than the interest.');
+  if(A.gneed.length&&A.gsum>A.fc)acts.push('Re-date your lowest-priority goal so the monthly total fits your surplus.');
+  if(!D.length&&A.efm>=A.tm)acts.push('With no debt and a full emergency fund, start a regular investment for your longest goal.');
+  if(!acts.length)acts.push('Keep your current plan and review it every quarter.');
+  $('#acts').innerHTML=acts.map(a=>`<div class="row"><div>${a}</div></div>`).join('');
+  const r=$('#ex');if(r)r.oninput=()=>{extraOverride=+r.value;renderAdvisor();const n=$('#ex');n.focus()};
+}
+
+/* example */
+$('#demo').onclick=()=>{S.profile={age:24,occ:'Salaried employee',income:45000,other:0,savings:30000};
+  S.exp={rent:7000,food:6000,transport:2500,utilities:2000,education:0,medical:1000,family:3000,subs:500,otherx:2000};
+  S.debts=[{type:'Education Loan',orig:500000,out:400000,rate:9,emi:8000,ten:60,due:5,pay:60,fc:0,pri:'Medium',sec:'Unsecured'},{type:'Gold Loan',orig:200000,out:150000,rate:12,emi:5000,ten:36,due:12,pay:36,fc:1,pri:'High',sec:'Secured'}];
+  const y=new Date().getFullYear()+2;S.goals=[{type:'Build emergency fund',name:'Emergency fund',tar:150000,cur:30000,date:y+'-06-01',pri:'High'},{type:'Save for higher education',name:'Master’s degree',tar:300000,cur:0,date:(y+2)+'-06-01',pri:'Medium'}];
+  extraOverride=null;save();fillProfile();renderAll()};
+</script>
+</body>
+</html>
